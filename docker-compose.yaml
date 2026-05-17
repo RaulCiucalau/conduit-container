@@ -32,6 +32,8 @@ services:
   frontend:
     build:
       context: ./conduit-frontend
+      args:
+        FRONTEND_API_URL: ${FRONTEND_API_URL}
     restart: unless-stopped
     depends_on:
       - backend
