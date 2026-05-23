@@ -15,7 +15,6 @@ The project includes:
 
 ## Table of Contents
 
-- [Installation](#installation)
 - [Quickstart](#quickstart)
 - [Usage](#usage)
 - [Configuration](#configuration)
@@ -24,7 +23,7 @@ The project includes:
 
 ---
 
-## Installation
+## Quickstart
 
 Clone the repository including submodules:
 
@@ -39,33 +38,17 @@ Create a local environment file:
 cp .env.example .env
 ```
 
----
-
-## Quickstart
-
 Build and start all containers:
 
 ```bash
 docker compose up -d --build
 ```
 
-Run database migrations:
+The backend entrypoint automatically:
 
-```bash
-docker compose exec backend python manage.py migrate
-```
-
-Collect static files:
-
-```bash
-docker compose exec backend python manage.py collectstatic --noinput
-```
-
-Create a Django superuser:
-
-```bash
-docker compose exec backend python manage.py createsuperuser
-```
+- runs database migrations
+- collects static files
+- creates/updates the configured Django superuser
 
 ---
 
@@ -102,6 +85,7 @@ Use `.env.example` as a template and configure:
 - allowed hosts
 - CORS origins
 - frontend API URL
+- Django superuser credentials
 
 Real `.env` files are ignored by Git and should never be committed.
 
