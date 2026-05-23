@@ -29,7 +29,7 @@ The project includes:
 Clone the repository including submodules:
 
 ```bash
-git clone --recurse-submodules <repository-url>
+git clone --recurse-submodules https://github.com/RaulCiucalau/conduit-container.git
 cd conduit-container
 ```
 
