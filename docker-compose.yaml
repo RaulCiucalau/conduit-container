@@ -1,0 +1,37 @@
+services:
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./conduit-backend
+    restart: unless-stopped
+    depends_on:
+      - database
+    env_file:
+      - .env
+    ports:
+      - "${BACKEND_PORT}:8000"
+
+  frontend:
+    build:
+      context: ./conduit-frontend
+      args:
+        FRONTEND_API_URL: ${FRONTEND_API_URL}
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT}:80"
+
+volumes:
+  postgres_data:
