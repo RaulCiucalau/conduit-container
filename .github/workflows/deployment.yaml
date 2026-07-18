@@ -1,0 +1,17 @@
+name: Conduit Deployment
+
+on:
+  push:
+    branches:
+      - feature/conduit-deployment
+
+jobs:
+  test-workflow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test workflow
+        run: echo "Deployment workflow started successfully"
