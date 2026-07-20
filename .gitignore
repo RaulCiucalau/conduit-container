@@ -6,6 +6,13 @@ __pycache__/
 # C extensions
 *.so
 
+# SSH keys
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+known_hosts
+
 # Distribution / packaging
 .Python
 build/
