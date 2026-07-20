@@ -1,0 +1,26 @@
+name: Conduit Deployment
+
+on:
+  push:
+    branches:
+      - feature/conduit-deployment
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build backend image
+        run: docker build -t conduit-backend ./conduit-backend
+
+      - name: Build frontend image
+        run: |
+          docker build \
+            --build-arg FRONTEND_API_URL=http://example.com:8000/api \
+            -t conduit-frontend \
+            ./conduit-frontend
