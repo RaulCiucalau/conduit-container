@@ -39,10 +39,10 @@ jobs:
           context: ./conduit-frontend
           push: true
           build-args: |
-            FRONTEND_API_URL=http://example.com:8000/api
+            FRONTEND_API_URL=${{ vars.FRONTEND_API_URL }}
           tags: ghcr.io/${{ github.repository_owner }}/conduit-frontend:latest
       
-      - name: Test SSH connection
+      - name: Deploy to VM
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -50,6 +50,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            echo "SSH connection successful"
-            hostname
-            whoami
+            cd ~/conduit-container
+            git pull
+            docker compose pull
+            docker compose up -d
