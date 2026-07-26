@@ -10,7 +10,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   backend:
-    image: ghcr.io/raulciucalau/conduit-backend:latest
+    image: ghcr.io/raulciucalau/conduit-backend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     depends_on:
       - database
@@ -20,7 +20,7 @@ services:
       - "${BACKEND_PORT}:8000"
 
   frontend:
-    image: ghcr.io/raulciucalau/conduit-frontend:latest
+    image: ghcr.io/raulciucalau/conduit-frontend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     depends_on:
       - backend
