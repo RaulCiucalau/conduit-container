@@ -3,8 +3,10 @@ name: Conduit Deployment
 on:
   push:
     branches:
-      - feature/conduit-deployment
-
+      - main
+  
+  workflow_dispatch:
+  
 permissions:
   contents: read
   packages: write
@@ -32,6 +34,7 @@ jobs:
           context: ./conduit-backend
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/conduit-backend:latest
+                ghcr.io/${{ github.repository_owner }}/conduit-backend:${{ github.sha }}
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -41,6 +44,7 @@ jobs:
           build-args: |
             FRONTEND_API_URL=${{ vars.FRONTEND_API_URL }}
           tags: ghcr.io/${{ github.repository_owner }}/conduit-frontend:latest
+                ghcr.io/${{ github.repository_owner }}/conduit-frontend:${{ github.sha }}
       
       - name: Deploy to VM
         uses: appleboy/ssh-action@v1
