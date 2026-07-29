@@ -111,16 +111,19 @@ PostgreSQL database with persistent Docker volume.
 
 ## Deployment
 
-For VM deployment:
+Deployment is automated using GitHub Actions.
 
-1. Create a `.env` file on the VM
-2. Update:
-   - `DJANGO_ALLOWED_HOSTS`
-   - `CORS_ALLOWED_ORIGINS`
-   - `FRONTEND_API_URL`
-3. Rebuild the frontend container
+When the deployment workflow is triggered, it:
 
-```bash
-docker compose build --no-cache frontend
-docker compose up -d
-```
+1. Checks out the repository and its submodules
+2. Builds the frontend and backend Docker images
+3. Pushes the images to GitHub Container Registry
+4. Connects to the cloud VM via SSH
+5. Pulls the latest Docker images
+6. Starts the application with Docker Compose in detached mode
+
+Docker images are built by GitHub Actions and not on the deployment VM.
+
+SSH credentials and other sensitive deployment values are stored as GitHub repository secrets.
+
+---

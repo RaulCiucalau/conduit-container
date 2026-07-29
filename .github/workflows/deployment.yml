@@ -1,0 +1,83 @@
+name: Conduit Deployment
+
+on:
+  push:
+    branches:
+      - main
+  
+  workflow_dispatch:
+  
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./conduit-backend
+          push: true
+          tags: | 
+            ghcr.io/${{ github.repository_owner }}/conduit-backend:latest
+            ghcr.io/${{ github.repository_owner }}/conduit-backend:${{ github.sha }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./conduit-frontend
+          push: true
+          build-args: |
+            FRONTEND_API_URL=${{ vars.FRONTEND_API_URL }}
+          tags: | 
+            ghcr.io/${{ github.repository_owner }}/conduit-frontend:latest
+            ghcr.io/${{ github.repository_owner }}/conduit-frontend:${{ github.sha }}
+
+      - name: Prepare deployment directory
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            mkdir -p ~/conduit-container
+
+      - name: Copy docker-compose file to VM
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "docker-compose.yaml"
+          target: "~/conduit-container"
+
+      - name: Deploy application on VM
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ~/conduit-container
+            echo "${{ secrets.ENV_FILE }}" > .env
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
